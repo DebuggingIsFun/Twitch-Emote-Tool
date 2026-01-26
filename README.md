@@ -11,11 +11,11 @@
 Originally created by **[Pewy (Artist)](https://pewy.art/)** and programmed by **Morksen**, this tool allows **bulk creation of Twitch emotes** (up to **40 per export**).
 
 ### **Key Features**
-✅ **Cross-platform** (Linux, Windows, macOS)
-✅ **Grid-based emote detection** (scans PNG templates for emotes)
-✅ **Custom naming** (or auto-generated names like `emote1_128x128`)
-✅ **Transparent background support** (PNG export)
-✅ **Preview with borders** (green = detected, red = empty)
+- ✅ **Cross-platform** (Linux, Windows, macOS)
+- ✅ **Grid-based emote detection** (scans PNG templates for emotes)
+- ✅ **Custom naming** (or auto-generated names like `emote1_128x128`)
+- ✅ **Transparent background support** (PNG export)
+- ✅ **Preview with borders** (green = detected, red = empty)
 
 ### **Templates**
 - **Old & New templates** are included in `/emote-template`.
@@ -78,9 +78,9 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 
 ## **🗓️ Roadmap & Future Plans**
 
-### **Planned: Pre-built Binaries (February 2025)**
+### **Planned: Pre-built Binaries (February 2026)**
 I'm working on providing **standalone executables** for:
-- 🐧 Linux (AppImage)
+- 🐧 Linux (Appimage or something else....)
 - 🪟 Windows (.exe)
 - 🍎 macOS (.app)
 
@@ -88,7 +88,7 @@ I'm working on providing **standalone executables** for:
 
 ---
 
-## **💬 A Word From the Developer**
+## **💬 A Word of Reason**
 
 This is a **hobby project** I work on in my free time. I'm not a professional developer - just someone who wanted to help my partner use this tool on Linux and learned a lot along the way!
 
