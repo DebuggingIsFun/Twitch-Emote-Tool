@@ -1,7 +1,6 @@
 # **Twitch Emote Tool (Python)**
 *A cross-platform rewrite of Pewy's Twitch Emote Tool for Linux/Windows/macOS.*
 
-![GitHub License](https://img.shields.io/github/license/yourusername/twitch-emote-tool?style=flat-square)
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue?style=flat-square)
 [![Demo GIF](./assets/Demo_26012026.gif)](./assets/Demo_26012026.gif)
 
