@@ -104,5 +104,6 @@ I truly hope this tool is **useful to artists and streamers** out there. If it s
 - **[Pewy](https://pewy.art/)** - Original concept & PNG templates
 - **Morksen** - Original Windows tool creator
 - **DebugginIsFun (kami_no_teki)** - This Python rewrite
+- **My Partner**
 
 ---
