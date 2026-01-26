@@ -56,12 +56,6 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 | Discord | 128 |
 | YouTube | 100, 48, 24 |
 
-
----
-
-## **🎬 Demo**
-![Demo GIF](./assets/Demo_26012026.gif)
-
 ---
 
 ## **⚠️ Important Notes**
