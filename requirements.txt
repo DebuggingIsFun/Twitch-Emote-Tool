@@ -1,0 +1,5 @@
+customtkinter>=5.2.0
+CTkFileDialog>=0.1.0
+Pillow>=9.0.0
+opencv-python>=4.5.0
+numpy>=1.20.0

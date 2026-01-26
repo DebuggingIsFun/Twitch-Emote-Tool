@@ -1,0 +1,5 @@
+emotes_export_multi/
+emote_test/
+__pycache__
+.venv/
+bak/
