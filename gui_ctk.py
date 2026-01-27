@@ -2,6 +2,7 @@ import customtkinter as ctk
 from CTkFileDialog import askopenfilename
 from PIL import Image
 import webbrowser
+import os
 
 
 class EmoteGUI:
@@ -62,27 +63,25 @@ class EmoteGUI:
             command=lambda: webbrowser.open("https://github.com/DebuggingIsFun/Twitch-Emote-Tool/issues"),
             width=60, height=30, font=ctk.CTkFont(size=12)
         )
-        bug_btn.place(x=50, y=310)
+        bug_btn.place(x=50, y=290)
         
         cancel_btn = ctk.CTkButton(
             self.app, text="Cancel", 
             width=60, height=30, 
             command=self.on_cancel
         )
-        cancel_btn.place(x=200, y=310)
+        cancel_btn.place(x=200, y=290)
         
         # Credits
         credits_frame = ctk.CTkFrame(self.app, height=25)
         credits_frame.place(x=0, y=350, relwidth=1.0)
-        
+
         credits_label = ctk.CTkLabel(
-            credits_frame, 
-            text="Made by streamingdummy",
-            font=ctk.CTkFont(size=10),
-            cursor="hand2"
+        credits_frame, 
+        text="Credits to: Pewy (Created the PNG Template) \n Morksen (Oirignal Tool Creator) \n DebugginIsFun aká kami_no_teki", 
+        font=ctk.CTkFont(size=10)
         )
-        credits_label.pack(pady=5)
-        credits_label.bind("<Button-1>", lambda e: webbrowser.open("https://twitch.tv/streamingdummy"))
+        credits_label.pack(pady=3)
     
     def create_checkboxes(self):
         checkboxes = [
@@ -125,58 +124,80 @@ class EmoteGUI:
     def show_preview_window(self, marked_img, cell_infos):
         if self.preview_window is not None:
             self.preview_window.destroy()
-        
-        self.preview_window = ctk.CTkToplevel(self.app)
-        self.preview_window.title("Preview & Name Emotes")
-        
-        # Calculate window size based on image
-        img_width, img_height = marked_img.size
-        max_width = 800
-        max_height = 600
-        
-        scale = min(max_width / img_width, max_height / img_height, 1.0)
-        display_width = int(img_width * scale)
-        display_height = int(img_height * scale)
-        
-        # Window size: image + naming panel
-        window_width = display_width + 250
-        window_height = max(display_height + 50, 400)
-        self.preview_window.geometry(f"{window_width}x{window_height}")
-        
-        # Image display
-        display_img = marked_img.resize((display_width, display_height), Image.Resampling.LANCZOS)
-        ctk_image = ctk.CTkImage(light_image=display_img, dark_image=display_img, size=(display_width, display_height))
-        
-        img_label = ctk.CTkLabel(self.preview_window, image=ctk_image, text="")
-        img_label.place(x=10, y=10)
-        
-        # Naming panel
-        naming_frame = ctk.CTkScrollableFrame(self.preview_window, width=220, height=window_height - 100)
-        naming_frame.place(x=display_width + 20, y=10)
-        
-        self.name_entries = []
+
         filled_cells = [c for c in cell_infos if c["has_content"]]
-        
+        filled_count = len(filled_cells)
+        total_cells = len(cell_infos)
+
+        self.preview_window = ctk.CTkToplevel(self.app)
+        self.preview_window.title(f"Emote Detection - {filled_count}/{total_cells} filled")
+
+        # Smart scaling from old version
+        screen_width = self.preview_window.winfo_screenwidth()
+        screen_height = self.preview_window.winfo_screenheight()
+        max_img_width = int(screen_width * 0.7)
+        max_img_height = int(screen_height * 0.7)
+
+        orig_width, orig_height = marked_img.size
+        scale = min(max_img_width / orig_width, max_img_height / orig_height, 0.45)
+        preview_width = int(orig_width * scale)
+        preview_height = int(orig_height * scale)
+
+        # Resize image for display
+        preview_img = marked_img.resize((preview_width, preview_height), Image.Resampling.LANCZOS)
+        photo = ctk.CTkImage(light_image=preview_img, dark_image=preview_img, size=(preview_width, preview_height))
+
+        # Left side: Image and info
+        left_frame = ctk.CTkFrame(self.preview_window)
+        left_frame.pack(side="left", fill="both", padx=20, pady=20)
+
+        img_label = ctk.CTkLabel(left_frame, image=photo, text="")
+        img_label.image = photo
+        img_label.pack(pady=10)
+
+        info_text = f"Green: {filled_count} filled | Red: {total_cells - filled_count} empty\n{os.path.basename(self.current_filename)}"
+        info_label = ctk.CTkLabel(left_frame, text=info_text, font=ctk.CTkFont(size=14))
+        info_label.pack(pady=(0, 10))
+
+        # Right side: Naming panel
+        right_frame = ctk.CTkFrame(self.preview_window)
+        right_frame.pack(side="right", fill="both", padx=(0, 20), pady=20)
+
+        naming_label = ctk.CTkLabel(right_frame, text="Name Your Emotes", font=ctk.CTkFont(size=16, weight="bold"))
+        naming_label.pack(pady=(10, 15))
+
+        # Scrollable frame for entries
+        naming_scroll = ctk.CTkScrollableFrame(right_frame, width=200, height=preview_height - 100)
+        naming_scroll.pack(fill="both", expand=True, padx=10)
+
+        self.name_entries = []
         for cell in filled_cells:
-            row_frame = ctk.CTkFrame(naming_frame)
+            row_frame = ctk.CTkFrame(naming_scroll)
             row_frame.pack(pady=5, fill="x")
-            
-            label = ctk.CTkLabel(row_frame, text=f"Emote #{cell['id']}:", width=80)
+
+            label = ctk.CTkLabel(row_frame, text=f"#{cell['id']}:", width=40)
             label.pack(side="left", padx=5)
-            
-            entry = ctk.CTkEntry(row_frame, width=120, placeholder_text="Enter name")
+
+            entry = ctk.CTkEntry(row_frame, width=140, placeholder_text="Enter name")
             entry.pack(side="left", padx=5)
-            
+
             self.name_entries.append((cell, entry))
-        
+
         # Export button
         export_btn = ctk.CTkButton(
-            self.preview_window, 
-            text="Export Emotes", 
+            right_frame,
+            text="Export Emotes",
             command=self.export_emotes,
             width=150, height=40
         )
-        export_btn.place(x=display_width + 50, y=window_height - 60)
+        export_btn.pack(pady=15)
+
+        # Auto-size window after content is added
+        self.preview_window.update_idletasks()
+        window_width = preview_width + 300
+        window_height = preview_height + 100
+        self.preview_window.geometry(f"{window_width}x{window_height}")
+
     
     def export_emotes(self):
         from core import export_emotes
@@ -212,12 +233,18 @@ class EmoteGUI:
         # Show success message
         success_window = ctk.CTkToplevel(self.app)
         success_window.title("Export Complete")
-        success_window.geometry("300x120")
+        success_window.geometry("300x200")
         
         ctk.CTkLabel(success_window, text=f"Exported {exported_count} files!").pack(pady=10)
         ctk.CTkLabel(success_window, text=f"Location: {out_dir}", wraplength=280).pack(pady=5)
-        ctk.CTkButton(success_window, text="OK", command=success_window.destroy).pack(pady=10)
+        #ctk.CTkButton(success_window, text="OK", command=success_window.destroy).pack(pady=10)
     
+        def close_all():
+            success_window.destroy()
+            self.app.quit()
+    
+        ctk.CTkButton(success_window, text="OK", command=close_all).pack(pady=10)
+
     def on_cancel(self):
         if self.naming_window:
             self.naming_window.destroy()
