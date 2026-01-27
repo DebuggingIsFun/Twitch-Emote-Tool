@@ -2,21 +2,72 @@ from PIL import Image, ImageDraw
 import cv2
 import numpy as np
 import os
+import logging
 
-def detect_emotes_with_rects(filename):
+
+def setup_logging(filename):
+    """
+    Set up logging to write to debug.log in same folder as the image.
+    Returns the logger and the debug directory path.
+    """
+    # Get directory where the image is located
+    debug_dir = os.path.dirname(filename)
+    log_path = os.path.join(debug_dir, "debug.log")
+    
+    # Create a logger
+    logger = logging.getLogger("emote_debug")
+    logger.setLevel(logging.DEBUG)
+    
+    # Remove old handlers (in case function is called multiple times)
+    logger.handlers.clear()
+    
+    # Create file handler - writes to debug.log
+    file_handler = logging.FileHandler(log_path, mode='w')
+    file_handler.setLevel(logging.DEBUG)
+    
+    # Create format with timestamp
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to logger
+    logger.addHandler(file_handler)
+    
+    return logger, debug_dir
+
+
+def detect_emotes_with_rects(filename, debug_enabled=False):
     """Detect rectangles, number filled ones, return marked image + cell data"""
+    
+    # Set up logging if debug is enabled
+    logger = None
+    debug_dir = None
+    if debug_enabled:
+        logger, debug_dir = setup_logging(filename)
+        logger.info("=== EMOTE DETECTION STARTED ===")
+        logger.info(f"Input file: {filename}")
     
     # OpenCV edge detection pipeline
     img = cv2.imread(filename, cv2.IMREAD_COLOR)
+    
+    if debug_enabled:
+        logger.info(f"Image loaded - Size: {img.shape[1]}x{img.shape[0]} pixels")
+    
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     edges = cv2.Canny(blur, 40, 120)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
     closed = cv2.dilate(edges, kernel, iterations=2)
     closed = cv2.erode(closed, kernel, iterations=2)
+    
+    if debug_enabled:
+        logger.debug("Edge detection completed (Canny + morphological operations)")
 
     # Find valid rectangles (size + aspect ratio filtered)
     contours, _ = cv2.findContours(closed, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    if debug_enabled:
+        logger.info(f"Found {len(contours)} total contours")
+    
     rects = []
     for cnt in contours:
         area = cv2.contourArea(cnt)
@@ -27,7 +78,10 @@ def detect_emotes_with_rects(filename):
         if 0.7 < aspect < 1.4:
             rects.append((x, y, w, h))
 
-    rects = sorted(rects, key=lambda r: (r[1] // 100, r[0]))  # Row-major order
+    rects = sorted(rects, key=lambda r: (r[1] // 100, r[0]))
+    
+    if debug_enabled:
+        logger.info(f"Filtered to {len(rects)} valid rectangles (area > 15000, aspect ratio 0.7-1.4)")
 
     # PIL image for drawing + content analysis
     pil_img = Image.open(filename).convert("RGBA")
@@ -52,15 +106,41 @@ def detect_emotes_with_rects(filename):
             draw.rectangle([x, y, x+w-1, y+h-1], outline="lime", width=4)
             draw.text((x+10, y+10), str(filled_count), fill="white", font_size=24)
             cell_infos.append({"rect": (x, y, w, h), "has_content": True, "id": filled_count})
+            
+            if debug_enabled:
+                logger.debug(f"Cell #{filled_count}: FILLED at position ({x}, {y}), size {w}x{h}")
+            
             filled_count += 1
         else:
             draw.rectangle([x, y, x+w-1, y+h-1], outline="red", width=2)
             cell_infos.append({"rect": (x, y, w, h), "has_content": False})
+            
+            if debug_enabled:
+                logger.debug(f"Cell: EMPTY at position ({x}, {y}), size {w}x{h}")
+    
+    if debug_enabled:
+        logger.info(f"Detection complete: {filled_count - 1} filled, {len(rects) - (filled_count - 1)} empty")
+        
+        # Save debug preview image
+        debug_img_path = os.path.join(debug_dir, "debug.png")
+        pil_img.save(debug_img_path)
+        logger.info(f"Debug preview saved: {debug_img_path}")
+        logger.info("=== DETECTION PHASE COMPLETE ===")
     
     return pil_img, cell_infos
 
-def export_emotes(current_filename, name_entries, selected_platforms):
+
+def export_emotes(current_filename, name_entries, selected_platforms, debug_enabled=False):
     """Export emotes in platform-specific sizes"""
+    
+    # Set up logging if debug is enabled
+    logger = None
+    if debug_enabled:
+        logger, _ = setup_logging(current_filename)
+        logger.info("=== EXPORT STARTED ===")
+        logger.info(f"Source file: {current_filename}")
+        logger.info(f"Platforms selected: {selected_platforms}")
+        logger.info(f"Emotes to export: {len(name_entries)}")
     
     # Platform size requirements
     platform_sizes = {
@@ -74,12 +154,18 @@ def export_emotes(current_filename, name_entries, selected_platforms):
     base_img = Image.open(current_filename).convert("RGBA")
     out_dir = os.path.join(os.path.dirname(current_filename), "emotes_export_multi")
     os.makedirs(out_dir, exist_ok=True)
+    
+    if debug_enabled:
+        logger.info(f"Output directory: {out_dir}")
 
     exported_count = 0
     for cell, name in name_entries:
         base_name = name.strip() or f"emote_{cell['id']}"
         x, y, w, h = cell["rect"]
         crop = base_img.crop((x, y, x + w, y + h))
+        
+        if debug_enabled:
+            logger.info(f"Processing emote #{cell['id']}: '{base_name}'")
 
         for platform in selected_platforms:
             for size_w, size_h in platform_sizes[platform]:
@@ -92,5 +178,11 @@ def export_emotes(current_filename, name_entries, selected_platforms):
                 out_path = os.path.join(out_dir, filename)
                 sized_emote.save(out_path, format="PNG")
                 exported_count += 1
+                
+                if debug_enabled:
+                    logger.debug(f"  Saved: {filename} for {platform}")
+    
+    if debug_enabled:
+        logger.info(f"=== EXPORT COMPLETE: {exported_count} files created ===")
     
     return exported_count, out_dir
