@@ -184,7 +184,8 @@ def export_emotes(current_filename, name_entries, selected_platforms, debug_enab
         # Use provided name or fallback to numbered default
         base_name = name.strip() or f"emote_{cell['id']}"
         x, y, w, h = cell["rect"]
-        crop = base_img.crop((x, y, x + w, y + h))
+        padding = 5
+        crop = base_img.crop((x + padding, y + padding, x + w - padding, y + h - padding))
         
         if debug_enabled:
             logger.info(f"Processing emote #{cell['id']}: '{base_name}'")

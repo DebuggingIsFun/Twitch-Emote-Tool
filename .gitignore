@@ -3,3 +3,4 @@ emote_test/
 __pycache__
 .venv/
 bak/
+debug/
