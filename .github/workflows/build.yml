@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write  # <-- ADD THIS!
+  contents: write
 
 jobs:
   build:
@@ -78,6 +78,13 @@ jobs:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
     
+    - name: List downloaded files (debug)
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Files downloaded:"
+        ls -R
+    
     - name: Create Pre-Release
       uses: softprops/action-gh-release@v1
       with:
@@ -85,8 +92,8 @@ jobs:
         name: Pre-Release Build ${{ github.run_number }}
         prerelease: true
         files: |
-          EmoteTool-Windows-PreRelease/*
-          EmoteTool-Linux-PreRelease/*
-          EmoteTool-macOS-PreRelease/*
+          EmoteTool-Windows-PreRelease/EmoteTool.exe
+          EmoteTool-Linux-PreRelease/EmoteTool
+          EmoteTool-macOS-PreRelease/EmoteTool
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
