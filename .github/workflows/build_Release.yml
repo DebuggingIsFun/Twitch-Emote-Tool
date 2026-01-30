@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[build release binary]')
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[build release binary]')
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -61,7 +63,9 @@ jobs:
   create-Release:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
     
     steps:
     - name: Download all artifacts
