@@ -1,4 +1,4 @@
-name: Build Executables
+name: Build Pre-Release Executables
 
 on:
   push:
