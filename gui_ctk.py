@@ -7,7 +7,7 @@ import os
 
 class EmoteGUI:
     def __init__(self):
-        ctk.set_appearance_mode("System")  # Follow OS theme
+        ctk.set_appearance_mode("dark")  # Make it Dark theme
         ctk.set_default_color_theme("blue")
         
         self.app = ctk.CTk()
