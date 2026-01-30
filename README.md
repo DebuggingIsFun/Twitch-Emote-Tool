@@ -50,17 +50,16 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 ### **Supported Export Platforms**
 | Platform | Sizes |
 |----------|-------|
-| Twitch Emotes | 300, 112, 56, 28 |
-| Twitch Badges | 200, 72, 36, 18 |
-| Kick | 500, 128, 64, 32 |
-| Discord | 128 |
-| YouTube | 100, 48, 24 |
+| Twitch Emotes | 112, 56, 28 |
+| Twitch Badges | 72, 36, 18 |
+| Kick | 128, 64, 32 |
+| Discord | 128, 64, 32 |
+| YouTube | 48, 24 |
 
 ---
 
 ## **⚠️ Important Notes**
-### **No Binary Available (Yet)**
-### **Work in Progress**
+### **Pre-Release Binaries avaiable look at current Tags**
 - **Install dependencies** from `requirements.txt`.
 - **Run manually**:
   ```bash
@@ -73,11 +72,11 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 
 ### **Planned: Pre-built Binaries (February 2026)**
 I'm working on providing **standalone executables** for:
-- 🐧 Linux (Appimage or something else....)
+- 🐧 Linux (raw)
 - 🪟 Windows (.exe)
-- 🍎 macOS (.app)
+- 🍎 macOS (raw)
 
-**Until then**, you'll need to run from source (see installation above).
+**Until then**, you'll need to run from source (see installation above) or run a Pre-Release look at the current Tags please!.
 
 ---
 
@@ -87,7 +86,7 @@ This is a **hobby project** I work on in my free time. I'm not a professional de
 
 ### **What this means:**
 - ⏰ Updates may be slow (life happens!)
-- 🐛 Bugs are possible - please report them!
+- 🐛 Bugs are possible - please report them! And make the Debug Checkbox enabled for detailed log! 
 - 🎯 Features are added when I have time and motivation
 
 ### **What I'd love from you:**
