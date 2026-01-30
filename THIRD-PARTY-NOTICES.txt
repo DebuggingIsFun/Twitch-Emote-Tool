@@ -1,0 +1,37 @@
+This project uses the following third-party libraries:
+
+================================================================================
+CustomTkinter
+================================================================================
+License: MIT License
+Copyright (c) 2021-2023 Tom Schimansky
+Source: https://github.com/TomSchimansky/CustomTkinter
+
+MIT License text: See ./third-party-licenses/customtkinter-LICENSE
+
+================================================================================
+Pillow (PIL Fork)
+================================================================================
+License: HPND License (Historical Permission Notice and Disclaimer)
+Copyright (c) 1997-2011 by Secret Labs AB
+Copyright (c) 1995-2011 by Fredrik Lundh
+Source: https://github.com/python-pillow/Pillow
+
+HPND License text: See ./third-party-licenses/pillow-LICENSE
+
+================================================================================
+OpenCV (opencv-python)
+================================================================================
+License: Apache License 2.0
+Source: https://github.com/opencv/opencv-python
+
+Apache 2.0 License text: See ./third-party-licenses/opencv-LICENSE
+
+================================================================================
+NumPy
+================================================================================
+License: BSD 3-Clause License
+Copyright (c) 2005-2023, NumPy Developers
+Source: https://github.com/numpy/numpy
+
+BSD 3-Clause License text: See ./third-party-licenses/numpy-LICENSE
