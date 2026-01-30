@@ -12,7 +12,9 @@ permissions:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[build PreRelease binary]')
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      contains(github.event.head_commit.message, '[build PreRelease binary]')
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
