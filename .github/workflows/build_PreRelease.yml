@@ -1,4 +1,4 @@
-name: Build Executables
+name: Build Pre-Release Executables
 
 on:
   push:
@@ -12,6 +12,9 @@ permissions:
 
 jobs:
   build:
+    if: |
+      github.event_name == 'workflow_dispatch' || 
+      contains(github.event.head_commit.message, '[build PreRelease binary]')
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -74,8 +77,8 @@ jobs:
     - name: Create Pre-Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: pre-release-${{ github.run_number }}
-        name: Pre-Release Build ${{ github.run_number }}
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Release ${{ steps.version.outputs.version }}
         prerelease: true
         files: |
           EmoteTool-Windows-PreRelease/EmoteTool.exe
