@@ -2,17 +2,16 @@ name: Build Pre-Release Executables
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    tags:
+      - 'pre-v*'
+    branches:
+      - testing
 
 permissions:
   contents: write
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[build PreRelease binary]')
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
@@ -26,7 +25,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
@@ -61,15 +60,12 @@ jobs:
   create-prerelease:
     needs: build
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Download all artifacts
       uses: actions/download-artifact@v4
 
-    - name: Rename files for unique names
+    - name: Rename files
       run: |
         mv EmoteTool-Linux-PreRelease/EmoteTool EmoteTool-Linux-PreRelease/EmoteTool-Linux
         mv EmoteTool-macOS-PreRelease/EmoteTool EmoteTool-macOS-PreRelease/EmoteTool-macOS
@@ -77,8 +73,8 @@ jobs:
     - name: Create Pre-Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: pre-release-${{ github.run_number }}
-        name: Pre-Release Build ${{ github.run_number }}
+        tag_name: ${{ github.ref_name }}
+        name: Pre-Release ${{ github.ref_name }}
         prerelease: true
         files: |
           EmoteTool-Windows-PreRelease/EmoteTool.exe
