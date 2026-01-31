@@ -2,7 +2,7 @@
 *A cross-platform rewrite of Pewy's Twitch Emote Tool for Linux/Windows/macOS.*
 
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue?style=flat-square)
-[![Demo GIF](./assets/Demo_26012026.gif)](./assets/Demo_26012026.gif)
+[![Demo GIF](./assets/Demo_31012026.gif)](./assets/Demo_31012026.gif)
 
 ---
 
@@ -37,11 +37,13 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 1. **Input**: Load a **PNG template** (grid-based, with emotes inside cells).
 2. **Detection**:
    - Scans **corners/edges** of each grid cell.
+   - Blurs and monocroms thems for easiert detection
    - **Green border** = Emote detected.
    - **Red border** = Empty cell (ignored in export).
 3. **Naming**:
-   - Click **"Show Name Fields"** to set custom names.
+   - On the Right side you can set **costum names** .
    - If no name is set, uses `emote1_128x128`, `emote2_128x128`, etc.
+   - Naming scheme is $name_$plattform_witdh_height.png so like **emote1_twitch_112x112.png**
 4. **Export**:
    - Creates a folder `emote_export_multi` in the **same directory as the template**.
    - Example:
@@ -58,27 +60,14 @@ The original tool was **Windows-only**, but my partner needed it on **Linux**. S
 
 ---
 
-## **⚠️ Important Notes**
-### **Pre-Release Binaries avaiable look at current Tags**
+## **How to Build from soure**
 - **Install dependencies** from `requirements.txt`.
 - **Run manually**:
   ```bash
-  git clone https://github.com/yourusername/twitch-emote-tool.git
+  git clone https://github.com/DebuggingIsFun/Twitch-Emote-Tool.git
   cd twitch-emote-tool
   pip install -r requirements.txt
   python main.py
-
-## **🗓️ Roadmap & Future Plans**
-
-### **Planned: Pre-built Binaries (February 2026)**
-I'm working on providing **standalone executables** for:
-- 🐧 Linux (raw)
-- 🪟 Windows (.exe)
-- 🍎 macOS (raw)
-
-**Until then**, you'll need to run from source (see installation above) or run a Pre-Release look at the current Tags please!.
-
----
 
 ## **💬 A Word of Reason**
 
