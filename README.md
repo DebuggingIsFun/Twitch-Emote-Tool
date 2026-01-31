@@ -2,6 +2,7 @@
 *A cross-platform rewrite of Pewy's Twitch Emote Tool for Linux/Windows/macOS.*
 
 ![Python Version](https://img.shields.io/badge/python-3.8+-blue?style=flat-square)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Demo GIF](./assets/Demo_31012026.gif)](./assets/Demo_31012026.gif)
 
 ---
