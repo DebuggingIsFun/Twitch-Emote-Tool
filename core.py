@@ -245,7 +245,7 @@ def export_emotes(current_filename, name_entries, selected_platforms, debug_enab
                 if not safe_name:
                     safe_name = f"emote_{cell['id']}"
                 
-                filename = f"{safe_name}_{size_w}x{size_h}.png"
+                filename = f"{safe_name}_{platform}_{size_w}x{size_h}.png"
                 out_path = os.path.join(out_dir, filename)
                 sized_emote.save(out_path, format="PNG")
                 exported_count += 1
