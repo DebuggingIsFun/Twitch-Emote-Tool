@@ -11,7 +11,13 @@ def setup_logging(filename):
     Returns the logger and the debug directory path.
     """
     # Place debug.log next to source image for easy bug reporting
-    debug_dir = os.path.dirname(filename)
+    # Create debug folder next to the source image
+    base_dir = os.path.dirname(filename)
+    debug_dir = os.path.join(base_dir, "debug")
+    
+    # Create the directory if it doesn't exist
+    os.makedirs(debug_dir, exist_ok=True)
+    
     log_path = os.path.join(debug_dir, "debug.log")
     
     # Create a logger
@@ -34,6 +40,20 @@ def setup_logging(filename):
     
     return logger, debug_dir
 
+def save_debug_image(debug_dir, filename, image, logger):
+    """
+    Helper function to save debug images.
+    Handles both OpenCV (numpy) and PIL images.
+    """
+    path = os.path.join(debug_dir, filename)
+    
+    if isinstance(image, np.ndarray):
+        cv2.imwrite(path, image)
+    else:
+        image.save(path)
+    
+    logger.debug(f"Saved debug image: {filename}")
+
 
 def detect_emotes_with_rects(filename, debug_enabled=False):
     """Detect rectangles, number filled ones, return marked image + cell data"""
@@ -52,23 +72,41 @@ def detect_emotes_with_rects(filename, debug_enabled=False):
     
     if debug_enabled:
         logger.info(f"Image loaded - Size: {img.shape[1]}x{img.shape[0]} pixels")
-    
+        save_debug_image(debug_dir, "01_original.png", img, logger)
     # Convert to grayscale - edges are easier to detect without color noise
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Look at the greyscaled Image
+    if debug_enabled:
+        save_debug_image(debug_dir, "02_grayscale.png", gray, logger)
 
     # Blur reduces noise that would create false edges
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
+    # Look at the blured Image
+    if debug_enabled:
+        save_debug_image(debug_dir, "03_blurred.png", blur, logger)
+
     # Canny finds edges by detecting brightness gradients
     edges = cv2.Canny(blur, 40, 120)
 
+    # Look at cannied Imagaes
+    if debug_enabled:
+        save_debug_image(debug_dir, "04_edges_canny.png", edges, logger)
+
     # Morphological operations close gaps in rectangle borders
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    closed = cv2.dilate(edges, kernel, iterations=2) # Expand edges to connect gaps
-    closed = cv2.erode(closed, kernel, iterations=2) # Shrink back to original size
+    dilated = cv2.dilate(edges, kernel, iterations=2) # Expand edges to connect gaps
+    
+    # Dialated Image
+    if debug_enabled:
+        save_debug_image(debug_dir, "05_dilated.png", dilated, logger)
+
+    closed = cv2.erode(dilated, kernel, iterations=2) # Shrink back to original size
     
     if debug_enabled:
-        logger.debug("Edge detection completed (Canny + morphological operations)")
+        save_debug_image(debug_dir, "06_closed_final.png", closed, logger)
+        logger.debug("Edge detection pipeline completed")
 
     # === STEP 2: Find and Filter Rectangles ===
     # Extract contours (connected edge regions) from the processed image
@@ -76,6 +114,9 @@ def detect_emotes_with_rects(filename, debug_enabled=False):
     
     if debug_enabled:
         logger.info(f"Found {len(contours)} total contours")
+        contour_debug = img.copy()
+        cv2.drawContours(contour_debug, contours, -1, (0, 255, 255), 2)
+        save_debug_image(debug_dir, "07_all_contours.png", contour_debug, logger)
     
     rects = []
     for cnt in contours:
@@ -95,6 +136,10 @@ def detect_emotes_with_rects(filename, debug_enabled=False):
     
     if debug_enabled:
         logger.info(f"Filtered to {len(rects)} valid rectangles (area > 15000, aspect ratio 0.7-1.4)")
+        rect_debug = img.copy()
+        for (x, y, w, h) in rects:
+            cv2.rectangle(rect_debug, (x, y), (x+w, y+h), (0, 255, 0), 3)
+        save_debug_image(debug_dir, "08_accepted_rectangles.png", rect_debug, logger)
 
     # === STEP 3: Analyze Cell Content ===
     # Switch to PIL for easier image manipulation and drawing
